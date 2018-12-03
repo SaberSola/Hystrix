@@ -4,8 +4,10 @@ apply plugin: 'me.champeau.gradle.jmh'
 dependencies {
     compileApi 'com.netflix.archaius:archaius-core:0.4.1'
     compileApi 'io.reactivex:rxjava:1.2.0'
-    compile 'org.slf4j:slf4j-api:1.7.0'
+    compile 'org.slf4j:slf4j-api:1.7.25'
     compileApi 'org.hdrhistogram:HdrHistogram:2.1.9'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
     testCompile 'junit:junit-dep:4.10'
     testCompile project(':hystrix-junit')
 }
