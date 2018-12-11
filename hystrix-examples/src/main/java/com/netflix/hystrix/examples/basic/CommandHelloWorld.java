@@ -31,6 +31,7 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 /**
  * The obligatory "Hello World!" showing a simple implementation of a {@link HystrixCommand}.
  */
+//命令模式 执行命令
 public class CommandHelloWorld extends HystrixCommand<String> {
 
     private final String name;
@@ -49,6 +50,7 @@ public class CommandHelloWorld extends HystrixCommand<String> {
 
         @Test
         public void testSynchronous() {
+
             assertEquals("Hello World!", new CommandHelloWorld("World").execute());
             assertEquals("Hello Bob!", new CommandHelloWorld("Bob").execute());
         }
@@ -76,12 +78,12 @@ public class CommandHelloWorld extends HystrixCommand<String> {
             Observable<String> fBob = new CommandHelloWorld("Bob").observe();
 
             // blocking
-            assertEquals("Hello World!", fWorld.toBlocking().single());
+            assertEquals("Hello World!", fWorld.toBlocking().single());  //阻塞
             assertEquals("Hello Bob!", fBob.toBlocking().single());
 
             // non-blocking 
             // - this is a verbose anonymous inner-class approach and doesn't do assertions
-            fWorld.subscribe(new Observer<String>() {
+            fWorld.subscribe(new Observer<String>() {  //非阻塞
 
                 @Override
                 public void onCompleted() {

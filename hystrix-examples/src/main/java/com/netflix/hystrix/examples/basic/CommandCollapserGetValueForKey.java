@@ -36,6 +36,11 @@ import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
 /**
  * Sample {@link HystrixCollapser} that automatically batches multiple requests to execute()/queue()
  * into a single {@link HystrixCommand} execution for all requests within the defined batch (time or size).
+ *
+ *
+ *  这个demo的例子是实现了请求的合并
+ *
+ *
  */
 public class CommandCollapserGetValueForKey extends HystrixCollapser<List<String>, String, Integer> {
 
@@ -61,6 +66,7 @@ public class CommandCollapserGetValueForKey extends HystrixCollapser<List<String
         for (CollapsedRequest<String, Integer> request : requests) {
             request.setResponse(batchResponse.get(count++));
         }
+        System.out.println("count = " + count);
     }
 
     private static final class BatchCommand extends HystrixCommand<List<String>> {
@@ -77,6 +83,7 @@ public class CommandCollapserGetValueForKey extends HystrixCollapser<List<String
             ArrayList<String> response = new ArrayList<String>();
             for (CollapsedRequest<String, Integer> request : requests) {
                 // artificial response for each argument received in the batch
+                System.out.println("zhanglei");
                 response.add("ValueForKey: " + request.getArgument());
             }
             return response;

@@ -33,6 +33,8 @@ import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
 /**
  * Sample {@link HystrixCommand} pattern using a semaphore-isolated command
  * that conditionally invokes thread-isolated commands.
+ * 适应信号量对命令进行隔离
+ *
  */
 public class CommandFacadeWithPrimarySecondary extends HystrixCommand<String> {
 
@@ -82,7 +84,7 @@ public class CommandFacadeWithPrimarySecondary extends HystrixCommand<String> {
                     .andThreadPoolKey(HystrixThreadPoolKey.Factory.asKey("PrimaryCommand"))
                     .andCommandPropertiesDefaults(
                             // we default to a 600ms timeout for primary
-                            HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(600)));
+                            HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(10000)));
             this.id = id;
         }
 
@@ -105,7 +107,7 @@ public class CommandFacadeWithPrimarySecondary extends HystrixCommand<String> {
                     .andThreadPoolKey(HystrixThreadPoolKey.Factory.asKey("SecondaryCommand"))
                     .andCommandPropertiesDefaults(
                             // we default to a 100ms timeout for secondary
-                            HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(100)));
+                            HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(5000)));
             this.id = id;
         }
 
@@ -124,7 +126,9 @@ public class CommandFacadeWithPrimarySecondary extends HystrixCommand<String> {
             HystrixRequestContext context = HystrixRequestContext.initializeContext();
             try {
                 ConfigurationManager.getConfigInstance().setProperty("primarySecondary.usePrimary", true);
-                assertEquals("responseFromPrimary-20", new CommandFacadeWithPrimarySecondary(20).execute());
+                CommandFacadeWithPrimarySecondary secondary = new CommandFacadeWithPrimarySecondary(20);
+                System.out.println(secondary.execute());
+                //assertEquals("responseFromPrimary-20", new CommandFacadeWithPrimarySecondary(20).execute());
             } finally {
                 context.shutdown();
                 ConfigurationManager.getConfigInstance().clear();
@@ -136,11 +140,20 @@ public class CommandFacadeWithPrimarySecondary extends HystrixCommand<String> {
             HystrixRequestContext context = HystrixRequestContext.initializeContext();
             try {
                 ConfigurationManager.getConfigInstance().setProperty("primarySecondary.usePrimary", false);
-                assertEquals("responseFromSecondary-20", new CommandFacadeWithPrimarySecondary(20).execute());
+                String secondary = new CommandFacadeWithPrimarySecondary(20).execute();
+                System.out.println(secondary);
+                //assertEquals("responseFromSecondary-20", new CommandFacadeWithPrimarySecondary(20).execute());
             } finally {
                 context.shutdown();
                 ConfigurationManager.getConfigInstance().clear();
             }
+        }
+
+        @Test
+        public void  testDynamicBooleanPropertytest(){
+
+            System.out.println(usePrimary.getValue());
+
         }
     }
 }
