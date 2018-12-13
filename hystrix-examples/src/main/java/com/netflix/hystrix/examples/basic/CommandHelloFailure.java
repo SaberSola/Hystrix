@@ -26,6 +26,7 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 
 /**
  * Sample {@link HystrixCommand} showing a basic fallback implementation.
+ * 服务降级
  */
 public class CommandHelloFailure extends HystrixCommand<String> {
 
@@ -41,6 +42,10 @@ public class CommandHelloFailure extends HystrixCommand<String> {
         throw new RuntimeException("this command always fails");
     }
 
+    /**
+     * 降级后的方法会走这里
+     * @return
+     */
     @Override
     protected String getFallback() {
         return "Hello Failure " + name + "!";
@@ -50,14 +55,14 @@ public class CommandHelloFailure extends HystrixCommand<String> {
 
         @Test
         public void testSynchronous() {
-            assertEquals("Hello Failure World!", new CommandHelloFailure("World").execute());
-            assertEquals("Hello Failure Bob!", new CommandHelloFailure("Bob").execute());
+            System.out.println(new CommandHelloFailure("World").execute());
+            System.out.println(new CommandHelloFailure("Bob").execute());
         }
 
         @Test
         public void testAsynchronous1() throws Exception {
-            assertEquals("Hello Failure World!", new CommandHelloFailure("World").queue().get());
-            assertEquals("Hello Failure Bob!", new CommandHelloFailure("Bob").queue().get());
+            System.out.println(new CommandHelloFailure("World").queue().get());
+            System.out.println(new CommandHelloFailure("Bob").queue().get());
         }
 
         @Test
@@ -66,8 +71,8 @@ public class CommandHelloFailure extends HystrixCommand<String> {
             Future<String> fWorld = new CommandHelloFailure("World").queue();
             Future<String> fBob = new CommandHelloFailure("Bob").queue();
 
-            assertEquals("Hello Failure World!", fWorld.get());
-            assertEquals("Hello Failure Bob!", fBob.get());
+            System.out.println(fWorld.get());
+            System.out.println(fBob.get());
         }
     }
 

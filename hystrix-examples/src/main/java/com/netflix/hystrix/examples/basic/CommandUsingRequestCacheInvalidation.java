@@ -17,18 +17,17 @@ package com.netflix.hystrix.examples.basic;
 
 import static org.junit.Assert.*;
 
+import com.netflix.hystrix.*;
 import org.junit.Test;
 
-import com.netflix.hystrix.HystrixCommand;
-import com.netflix.hystrix.HystrixCommandGroupKey;
-import com.netflix.hystrix.HystrixCommandKey;
-import com.netflix.hystrix.HystrixRequestCache;
 import com.netflix.hystrix.strategy.concurrency.HystrixConcurrencyStrategyDefault;
 import com.netflix.hystrix.strategy.concurrency.HystrixRequestContext;
 
 /**
  * Example {@link HystrixCommand} implementation for handling the get-set-get use case within
  * a single request context so that the "set" can invalidate the cached "get".
+ *
+ * 单个请求中 set 操作会使用get操作无效
  */
 public class CommandUsingRequestCacheInvalidation {
 
@@ -42,7 +41,7 @@ public class CommandUsingRequestCacheInvalidation {
 
         public GetterCommand(int id) {
             super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("GetSetGet"))
-                    .andCommandKey(GETTER_KEY));
+                    .andCommandKey(GETTER_KEY).andThreadPoolKey(HystrixThreadPoolKey.Factory.asKey("zlagafaf")));
             this.id = id;
         }
 

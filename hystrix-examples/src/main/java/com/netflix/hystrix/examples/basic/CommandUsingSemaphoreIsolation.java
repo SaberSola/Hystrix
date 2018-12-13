@@ -1,12 +1,12 @@
 /**
  * Copyright 2012 Netflix, Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,9 @@ import com.netflix.hystrix.HystrixCommand;
 import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import com.netflix.hystrix.HystrixCommandProperties.ExecutionIsolationStrategy;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Example of {@link HystrixCommand} defaulting to use a semaphore isolation strategy
@@ -33,7 +36,7 @@ public class CommandUsingSemaphoreIsolation extends HystrixCommand<String> {
                 // since we're doing work in the run() method that doesn't involve network traffic
                 // and executes very fast with low risk we choose SEMAPHORE isolation
                 .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
-                        .withExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE)));
+                        .withExecutionIsolationStrategy(ExecutionIsolationStrategy.SEMAPHORE))); //使用信号量进行隔离
         this.id = id;
     }
 
@@ -42,6 +45,29 @@ public class CommandUsingSemaphoreIsolation extends HystrixCommand<String> {
         // a real implementation would retrieve data from in memory data structure
         // or some other similar non-network involved work
         return "ValueFromHashMap_" + id;
+    }
+
+    @Override
+    protected String getFallback() {
+        return "ValueFromHashMap_" + id;
+    }
+
+    public static void main(String[] args){
+
+        ExecutorService executorService = Executors.newFixedThreadPool(50);
+        for (int i = 0; i < 30; i ++){
+            executorService.execute((new Runnable() {
+                @Override
+                public void run() {
+                    CommandUsingSemaphoreIsolation commandUsingSemaphoreIsolation = new CommandUsingSemaphoreIsolation(1);
+                    try {
+                        System.out.println(commandUsingSemaphoreIsolation.execute()) ;
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }));
+        }
     }
 
 }

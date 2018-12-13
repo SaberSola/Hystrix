@@ -27,6 +27,7 @@ import com.netflix.hystrix.examples.basic.CommandWithStubbedFallback.UserAccount
  * Sample {@link HystrixCommand} that implements a fallback that returns an object
  * combining defaults and injected values from elsewhere in the system (such as
  * HTTP request headers, arguments and cookies or other services previously executed).
+ * 返回一个实体对象
  */
 public class CommandWithStubbedFallback extends HystrixCommand<UserAccount> {
 
